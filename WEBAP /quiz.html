@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LoveMatch Compatibility Quiz</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+
+    <!-- NOTICE SCREEN -->
+    <div id="noticeScreen">
+      <h1>💖 LoveMatch</h1>
+      <h2 class="notice-heading">⚠️ Important Before You Begin</h2>
+      <p class="notice-text">
+        This AI-powered compatibility quiz analyzes 30 factors based on your behavior and interaction to assess whether you're:
+      </p>
+      <ul class="result-possibilities">
+        <li>👫 Just Friends</li>
+        <li>🤝 Great Pair</li>
+        <li>❤️ Meant to Be</li>
+      </ul>
+
+      <div class="disclaimer">
+        <p><strong>Please note:</strong></p>
+        <ul class="notice-list">
+          <li>💡 This is for <strong>fun only</strong> — not a serious or clinical evaluation.</li>
+          <li>🎯 Model sensitivity is high. Each answer can significantly affect your result.</li>
+          <li>📊 Accuracy:
+            <ul>
+              <li><strong>XGBoost:</strong> 94.5%</li>
+              <li><strong>Random Forest:</strong> 88.6%</li>
+            </ul>
+          </li>
+          <li>🧠 Built using behavior data + machine learning models.</li>
+        </ul>
+      </div>
+
+      <button id="startQuizBtn" class="start-btn">I Understand, Let's Begin</button>
+    </div>
+
+    <!-- QUIZ FORM -->
+    <form id="quizForm" style="display: none;">
+      <h2 id="questionTitle"></h2>
+      <p id="questionDesc"></p>
+      <input type="number" id="answerInput" name="answer" step="0.1" required />
+      <div class="button-group">
+        <button type="button" id="prevBtn">Previous</button>
+        <button type="button" id="nextBtn">Next</button>
+      </div>
+    </form>
+    <!-- RESULT SCREEN -->
+    <div id="resultScreen" style="display:none; text-align:center;">
+      <h2>Your Relationship Prediction:</h2>
+      <div id="resultLabel" style="font-size:2em; margin:1em 0;"></div>
+      <button onclick="window.location.reload()" class="start-btn">Try Again</button>
+    </div>
+    
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Hook for showing result after fetch in script.js
+    window.showQuizResult = function(result) {
+      document.getElementById("quizForm").style.display = "none";
+      document.getElementById("resultScreen").style.display = "block";
+      document.getElementById("resultLabel").innerText = result.meaning;
+    }
+  </script>
+</body>
+</html>

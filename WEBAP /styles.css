@@ -1,0 +1,94 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #e0f7fa, #f8f9fa);
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  width: 500px;
+  text-align: center;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+.notice-text {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.notice-list {
+  text-align: left;
+  margin: 0 auto 2rem auto;
+  max-width: 600px;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.start-btn {
+  padding: 0.8rem 1.5rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.start-btn:hover {
+  background-color: #218838;
+}
