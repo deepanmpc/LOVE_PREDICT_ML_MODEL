@@ -1,6 +1,6 @@
-# 💖 LOVE_PREDICT_ML_MODEL
+#  LOVE_PREDICT_ML_MODEL
 
-## 🧠 What It Does
+## What It Does
 This machine learning model predicts **relationship compatibility** based on behavioral, emotional, and psychological features from two individuals. The system classifies their connection into one of **three categories**:
 
 - `0` – Just Friends
@@ -33,7 +33,7 @@ pip install pandas scikit-learn xgboost joblib flask
 
 ---
 
-## 📊 Training the Model
+##  Training the Model
 
 ```bash
 python train_model.py
@@ -48,7 +48,7 @@ This will:
 
 ---
 
-## 🖥️ How to Use
+##  How to Use
 
 - Start your Flask server:
 ```bash
@@ -71,7 +71,7 @@ curl -X POST http://localhost:5000/predict \
 
 ---
 
-## 🌐 Web UI
+##  Web UI
 
 The frontend (HTML/CSS/JS) provides:
 - A landing page with explanation
@@ -81,7 +81,7 @@ The frontend (HTML/CSS/JS) provides:
 
 ---
 
-## 📦 Folder Structure
+##  Folder Structure
 
 ```
 LOVE_PREDICT_ML_MODEL/
@@ -108,7 +108,7 @@ LOVE_PREDICT_ML_MODEL/
 
 ---
 
-## ⚠️ Disclaimer
+##  Disclaimer
 
 - **This tool is for entertainment and educational use only.**
 - It is not meant for serious relationship decisions.
@@ -118,7 +118,7 @@ LOVE_PREDICT_ML_MODEL/
 
 ---
 
-## 🧪 Dependencies
+##  Dependencies
 
 - `pandas`
 - `scikit-learn`
@@ -129,13 +129,13 @@ LOVE_PREDICT_ML_MODEL/
 
 ---
 
-## 👨‍💻 Author
+## Author
 
-**Deepan De**  
-Made with ❤️ for AI + Relationship Fun
+**Deepan**  
+Made with  for AI + Relationship Fun
 
 ---
 
-## 🪪 License
+##  License
 
 This project is open-sourced under the **MIT License**.
