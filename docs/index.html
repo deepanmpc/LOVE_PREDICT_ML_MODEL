@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Love Predict — ML Compatibility Model</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rose: #e8445a;
+      --blush: #f7c5cc;
+      --deep: #1a0a0d;
+      --card: #1f0f13;
+      --gold: #c9a84c;
+      --text: #f0e6e8;
+      --muted: #9a7a80;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--deep);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── Noise texture overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── Gradient orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(232,68,90,0.18) 0%, transparent 70%); top: -200px; left: -150px; animation: drift1 18s ease-in-out infinite; }
+    .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%); bottom: -100px; right: -100px; animation: drift2 22s ease-in-out infinite; }
+    .orb-3 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(232,68,90,0.10) 0%, transparent 70%); top: 50%; left: 55%; animation: drift3 16s ease-in-out infinite; }
+
+    @keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(80px,60px)} }
+    @keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-60px,-40px)} }
+    @keyframes drift3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-80px)} }
+
+    /* ── Wrapper ── */
+    .wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      background: rgba(26,10,13,0.7);
+      border-bottom: 1px solid rgba(232,68,90,0.15);
+      padding: 1.1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--rose); letter-spacing: 0.02em; }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+      padding-top: 5rem;
+    }
+    .hero-eyebrow {
+      font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.4rem;
+      display: flex; align-items: center; gap: 0.8rem;
+      opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+    }
+    .hero-eyebrow::before { content: ''; display: block; width: 40px; height: 1px; background: var(--gold); }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 8vw, 7.5rem);
+      line-height: 1.0;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+      opacity: 0; animation: fadeUp 0.9s 0.35s forwards;
+    }
+    .hero h1 em { font-style: italic; color: var(--rose); display: block; }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted); line-height: 1.7; max-width: 520px;
+      margin-top: 1.8rem; margin-bottom: 2.8rem;
+      opacity: 0; animation: fadeUp 0.9s 0.5s forwards;
+    }
+    .hero-ctas {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.9s 0.65s forwards;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.85rem 1.8rem; border-radius: 0;
+      font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; font-family: 'DM Sans', sans-serif;
+      transition: all 0.25s;
+      cursor: pointer; border: none;
+    }
+    .btn-primary {
+      background: var(--rose); color: #fff;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+    .btn-primary:hover { background: #f05570; transform: translateY(-2px); }
+    .btn-ghost {
+      background: transparent; color: var(--text);
+      border: 1px solid rgba(240,230,232,0.2);
+    }
+    .btn-ghost:hover { border-color: var(--rose); color: var(--rose); }
+
+    /* accuracy badge */
+    .badge-row {
+      display: flex; gap: 1.5rem; margin-top: 4rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.9s 0.8s forwards;
+    }
+    .badge {
+      display: flex; flex-direction: column;
+      border-left: 2px solid var(--rose); padding-left: 1rem;
+    }
+    .badge-val { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--rose); line-height: 1; }
+    .badge-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.3rem; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── SECTION COMMONS ── */
+    section { padding: 7rem 0; }
+    .section-label {
+      font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+    .section-label::before { content: ''; display: block; width: 30px; height: 1px; background: var(--gold); }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.1; margin-bottom: 1.5rem;
+    }
+    .section-title em { font-style: italic; color: var(--rose); }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0; margin-top: 3rem;
+    }
+    .step {
+      padding: 2.5rem 2rem;
+      border: 1px solid rgba(232,68,90,0.15);
+      border-right: none; position: relative;
+      transition: background 0.3s;
+    }
+    .step:last-child { border-right: 1px solid rgba(232,68,90,0.15); }
+    .step:hover { background: rgba(232,68,90,0.04); }
+    .step-num {
+      font-family: 'Playfair Display', serif; font-size: 4rem;
+      color: rgba(232,68,90,0.15); line-height: 1;
+      position: absolute; top: 1.5rem; right: 1.5rem;
+    }
+    .step-icon { font-size: 1.8rem; margin-bottom: 1.2rem; }
+    .step h3 { font-size: 1rem; font-weight: 500; margin-bottom: 0.6rem; }
+    .step p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── MODELS ── */
+    .models-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5px; margin-top: 3rem; background: rgba(232,68,90,0.15);
+    }
+    .model-card {
+      background: var(--card); padding: 2.5rem;
+      transition: transform 0.3s;
+    }
+    .model-card:hover { transform: translateY(-4px); }
+    .model-name {
+      font-family: 'Playfair Display', serif; font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .model-tag {
+      display: inline-block; font-size: 0.7rem; letter-spacing: 0.12em;
+      text-transform: uppercase; padding: 0.3rem 0.7rem;
+      background: rgba(232,68,90,0.15); color: var(--rose);
+      margin-bottom: 1.5rem;
+    }
+    .model-acc {
+      font-family: 'Playfair Display', serif; font-size: 3.5rem;
+      color: var(--rose); line-height: 1; margin-bottom: 0.3rem;
+    }
+    .model-acc-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.5rem; }
+    .model-bar { height: 3px; background: rgba(240,230,232,0.08); margin-bottom: 1.5rem; }
+    .model-bar-fill { height: 100%; background: linear-gradient(90deg, var(--rose), var(--gold)); transition: width 1.5s ease; }
+    .model-features { list-style: none; }
+    .model-features li {
+      font-size: 0.85rem; color: var(--muted); padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(240,230,232,0.06);
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .model-features li::before { content: '→'; color: var(--rose); font-size: 0.7rem; }
+    .model-card.featured { border-top: 2px solid var(--rose); }
+    .featured-badge {
+      font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.5rem;
+    }
+
+    /* ── CLASSES ── */
+    .classes-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .class-card {
+      padding: 2.5rem 2rem;
+      border: 1px solid rgba(232,68,90,0.12);
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .class-card:hover { border-color: rgba(232,68,90,0.4); }
+    .class-card::after {
+      content: attr(data-class);
+      position: absolute; bottom: -0.5rem; right: 1rem;
+      font-family: 'Playfair Display', serif; font-size: 6rem;
+      color: rgba(232,68,90,0.05); pointer-events: none; line-height: 1;
+    }
+    .class-pill {
+      display: inline-block; padding: 0.25rem 0.8rem;
+      border: 1px solid currentColor; border-radius: 999px;
+      font-size: 0.75rem; letter-spacing: 0.1em;
+      margin-bottom: 1.2rem;
+    }
+    .class-0 .class-pill { color: #7da8c5; }
+    .class-1 .class-pill { color: var(--gold); }
+    .class-2 .class-pill { color: var(--rose); }
+    .class-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .class-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── FEATURES ── */
+    .features-list {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem; margin-top: 3rem;
+    }
+    .feature-item {
+      padding: 1.2rem 1.5rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.85rem; color: var(--muted);
+      display: flex; align-items: center; gap: 0.8rem;
+      transition: all 0.2s;
+    }
+    .feature-item:hover { color: var(--text); border-color: rgba(232,68,90,0.2); }
+    .feature-item span { color: var(--rose); font-size: 0.75rem; }
+
+    /* ── API SECTION ── */
+    .api-block {
+      background: var(--card);
+      border: 1px solid rgba(232,68,90,0.15);
+      margin-top: 2rem;
+    }
+    .api-tabs {
+      display: flex; border-bottom: 1px solid rgba(232,68,90,0.15);
+    }
+    .api-tab {
+      padding: 0.8rem 1.5rem; font-size: 0.8rem;
+      letter-spacing: 0.08em; cursor: pointer;
+      color: var(--muted); transition: all 0.2s;
+      border: none; background: none; text-transform: uppercase;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .api-tab.active { color: var(--text); background: rgba(232,68,90,0.1); }
+    .api-body { padding: 2rem; }
+    pre {
+      font-family: 'Courier New', monospace; font-size: 0.82rem;
+      line-height: 1.8; color: #e0c8cb; overflow-x: auto;
+    }
+    .kw { color: var(--rose); }
+    .str { color: var(--gold); }
+    .cmt { color: var(--muted); }
+    .num { color: #7da8c5; }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      text-align: center; padding: 8rem 0;
+      border-top: 1px solid rgba(232,68,90,0.1);
+    }
+    .cta-section .section-label { justify-content: center; }
+    .cta-section .section-title { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+    .cta-section p { color: var(--muted); max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.7; }
+    .cta-section .hero-ctas { justify-content: center; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(232,68,90,0.1);
+      padding: 3rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem; position: relative; z-index: 1;
+    }
+    .footer-brand { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--rose); }
+    .footer-meta { font-size: 0.78rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { font-size: 0.78rem; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--rose); }
+
+    /* ── HEART ANIMATION ── */
+    .heart-float {
+      position: absolute; right: 5%; top: 50%; transform: translateY(-50%);
+      width: 320px; height: 320px; opacity: 0.06;
+      animation: heartbeat 4s ease-in-out infinite;
+    }
+    @keyframes heartbeat {
+      0%,100%{transform:translateY(-50%) scale(1)}
+      50%{transform:translateY(-50%) scale(1.08)}
+    }
+
+    @media(max-width:768px) {
+      .classes-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .step { border-right: 1px solid rgba(232,68,90,0.15); border-bottom: none; }
+      .step:last-child { border-bottom: 1px solid rgba(232,68,90,0.15); }
+      .heart-float { display: none; }
+      footer { flex-direction: column; text-align: center; }
+    }
+
+    /* Tab content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">♡ Love Predict</div>
+    <div class="nav-links">
+      <a href="#how">How It Works</a>
+      <a href="#models">Models</a>
+      <a href="#api">API</a>
+      <a href="https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL" target="_blank">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap" style="position:relative;">
+      <div class="hero-eyebrow">Machine Learning · Compatibility Prediction</div>
+      <h1>Will It<br><em>Work Out?</em></h1>
+      <p class="hero-sub">
+        A behavioral-psychological ML model that classifies romantic compatibility
+        from 30 relationship-based features — powered by XGBoost at <strong>94.5%</strong> accuracy.
+      </p>
+      <div class="hero-ctas">
+        <a href="https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL" target="_blank" class="btn btn-primary">View on GitHub</a>
+        <a href="#how" class="btn btn-ghost">Learn How It Works</a>
+      </div>
+      <div class="badge-row">
+        <div class="badge">
+          <span class="badge-val">94.5%</span>
+          <span class="badge-label">XGBoost Accuracy</span>
+        </div>
+        <div class="badge">
+          <span class="badge-val">30</span>
+          <span class="badge-label">Input Features</span>
+        </div>
+        <div class="badge">
+          <span class="badge-val">3</span>
+          <span class="badge-label">Compatibility Classes</span>
+        </div>
+      </div>
+
+      <!-- Heart SVG watermark -->
+      <svg class="heart-float" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#e8445a">
+        <path d="M50 88 C20 68 5 52 5 35 C5 20 17 10 30 10 C38 10 45 14 50 20 C55 14 62 10 70 10 C83 10 95 20 95 35 C95 52 80 68 50 88Z"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How It <em>Works</em></h2>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">01</span>
+          <div class="step-icon">📋</div>
+          <h3>Answer 30 Questions</h3>
+          <p>The web UI walks you through 30 behavioral and psychological questions about both individuals, one at a time.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">02</span>
+          <div class="step-icon">⚙️</div>
+          <h3>Feature Engineering</h3>
+          <p>Responses are scaled using a fitted StandardScaler and fed into the trained ML model via a Flask endpoint.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">03</span>
+          <div class="step-icon">🤖</div>
+          <h3>Model Inference</h3>
+          <p>XGBoost or Random Forest classifier runs inference on the 30-dimensional feature vector in milliseconds.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">04</span>
+          <div class="step-icon">💌</div>
+          <h3>Compatibility Result</h3>
+          <p>The model returns a class — Just Friends, Could Work Out, or Strong Match — displayed with animation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODELS -->
+  <section id="models">
+    <div class="wrap">
+      <div class="section-label">Machine Learning</div>
+      <h2 class="section-title">The <em>Models</em></h2>
+      <div class="models-grid">
+
+        <div class="model-card featured">
+          <div class="featured-badge">★ Primary Model</div>
+          <div class="model-name">XGBoost</div>
+          <div class="model-tag">Gradient Boosted Trees</div>
+          <div class="model-acc">94.5%</div>
+          <div class="model-acc-label">Validation Accuracy</div>
+          <div class="model-bar"><div class="model-bar-fill" style="width:94.5%" id="bar1"></div></div>
+          <ul class="model-features">
+            <li>Handles feature interactions naturally</li>
+            <li>Robust to imbalanced classes</li>
+            <li>Fast inference — millisecond predictions</li>
+            <li>Saved as <code>xgb_model.pkl</code> + <code>scaler.pkl</code></li>
+          </ul>
+        </div>
+
+        <div class="model-card">
+          <div class="model-name">Random Forest</div>
+          <div class="model-tag">Ensemble Method</div>
+          <div class="model-acc">88.6%</div>
+          <div class="model-acc-label">Validation Accuracy</div>
+          <div class="model-bar"><div class="model-bar-fill" style="width:88.6%" id="bar2"></div></div>
+          <ul class="model-features">
+            <li>Interpretable feature importance</li>
+            <li>Resistant to overfitting</li>
+            <li>Alternative fallback model</li>
+            <li>Trained via <code>random forest.ipynb</code></li>
+          </ul>
+        </div>
+
+        <div class="model-card">
+          <div class="model-name">KNN</div>
+          <div class="model-tag">k-Nearest Neighbors</div>
+          <div class="model-acc">—</div>
+          <div class="model-acc-label">Experimental</div>
+          <div class="model-bar"><div class="model-bar-fill" style="width:70%" id="bar3"></div></div>
+          <ul class="model-features">
+            <li>Baseline comparison model</li>
+            <li>Distance-based similarity</li>
+            <li>Explored in <code>knn.ipynb</code></li>
+            <li>Good for understanding feature space</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CLASSES -->
+  <section>
+    <div class="wrap">
+      <div class="section-label">Output</div>
+      <h2 class="section-title">The Three <em>Classes</em></h2>
+      <div class="classes-grid">
+        <div class="class-card class-0" data-class="0">
+          <div class="class-pill">Class 0</div>
+          <h3>Just Friends</h3>
+          <p>Compatibility signals suggest the relationship is better suited to a platonic dynamic. Differences outweigh shared emotional alignment.</p>
+        </div>
+        <div class="class-card class-1" data-class="1">
+          <div class="class-pill">Class 1</div>
+          <h3>Could Work Out</h3>
+          <p>Mixed signals — some strong compatibility markers exist alongside areas of friction. Growth and communication could bridge the gaps.</p>
+        </div>
+        <div class="class-card class-2" data-class="2">
+          <div class="class-pill">Class 2</div>
+          <h3>Strong Match</h3>
+          <p>High compatibility across behavioral, emotional, and psychological features. The model sees strong alignment across most dimensions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="wrap">
+      <div class="section-label">Input Features</div>
+      <h2 class="section-title">30 <em>Signals</em></h2>
+      <p style="color:var(--muted);max-width:600px;line-height:1.7;margin-bottom:0">
+        The model evaluates behavioral and psychological dimensions across both individuals.
+        Here's a sample of the 30 features that drive prediction:
+      </p>
+      <div class="features-list">
+        <div class="feature-item"><span>→</span> Communication Frequency</div>
+        <div class="feature-item"><span>→</span> Trust Score</div>
+        <div class="feature-item"><span>→</span> Conflict Resolution Style</div>
+        <div class="feature-item"><span>→</span> Emotional Support Level</div>
+        <div class="feature-item"><span>→</span> Shared Interests Index</div>
+        <div class="feature-item"><span>→</span> Physical Affection Score</div>
+        <div class="feature-item"><span>→</span> Future Goals Alignment</div>
+        <div class="feature-item"><span>→</span> Jealousy Intensity</div>
+        <div class="feature-item"><span>→</span> Attachment Style Score</div>
+        <div class="feature-item"><span>→</span> Love Language Match</div>
+        <div class="feature-item"><span>→</span> Stress Response Pattern</div>
+        <div class="feature-item"><span>→</span> Reaction to Praise</div>
+        <div class="feature-item"><span>→</span> Independence Level</div>
+        <div class="feature-item"><span>→</span> Forgiveness Capacity</div>
+        <div class="feature-item"><span>→</span> + 16 more psychological signals</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- API -->
+  <section id="api">
+    <div class="wrap">
+      <div class="section-label">Integration</div>
+      <h2 class="section-title">The <em>API</em></h2>
+      <p style="color:var(--muted);max-width:600px;line-height:1.7;margin-bottom:0">
+        The Flask backend exposes a simple <code style="color:var(--rose);">/predict</code> endpoint. POST your 30 features, get a compatibility class back.
+      </p>
+      <div class="api-block">
+        <div class="api-tabs">
+          <button class="api-tab active" onclick="switchTab('curl', this)">cURL</button>
+          <button class="api-tab" onclick="switchTab('python', this)">Python</button>
+          <button class="api-tab" onclick="switchTab('response', this)">Response</button>
+        </div>
+        <div class="api-body">
+          <div class="tab-content active" id="tab-curl">
+<pre><span class="cmt"># POST to the prediction endpoint</span>
+curl -X POST http://localhost:<span class="num">5000</span>/predict \
+     -H <span class="str">"Content-Type: application/json"</span> \
+     -d <span class="str">'{
+       "communication_frequency": 8,
+       "trust_score": 9,
+       "conflict_resolution": 7,
+       "emotional_support": 8,
+       ...
+       "reaction_to_praise": 2
+     }'</span></pre>
+          </div>
+          <div class="tab-content" id="tab-python">
+<pre><span class="kw">import</span> requests
+
+features = {
+    <span class="str">"communication_frequency"</span>: <span class="num">8</span>,
+    <span class="str">"trust_score"</span>: <span class="num">9</span>,
+    <span class="str">"conflict_resolution"</span>: <span class="num">7</span>,
+    <span class="cmt"># ... all 30 features</span>
+}
+
+response = requests.post(
+    <span class="str">"http://localhost:5000/predict"</span>,
+    json=features
+)
+print(response.json())</pre>
+          </div>
+          <div class="tab-content" id="tab-response">
+<pre><span class="cmt"># Class 0 — Just Friends</span>
+{ <span class="str">"prediction"</span>: <span class="num">0</span> }
+
+<span class="cmt"># Class 1 — Could Work Out</span>
+{ <span class="str">"prediction"</span>: <span class="num">1</span> }
+
+<span class="cmt"># Class 2 — Strong Match</span>
+{ <span class="str">"prediction"</span>: <span class="num">2</span> }</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="wrap">
+      <div class="section-label">Open Source</div>
+      <h2 class="section-title">Try It <em>Yourself</em></h2>
+      <p>Clone the repo, train the model on your dataset, and run the web UI locally. Built for learning, exploration, and a bit of romantic curiosity.</p>
+      <div class="hero-ctas">
+        <a href="https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL" target="_blank" class="btn btn-primary">Clone on GitHub</a>
+        <a href="https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL/blob/main/README.md" target="_blank" class="btn btn-ghost">Read the Docs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">♡ Love Predict ML</div>
+    <div class="footer-meta">Built by Deepan · MIT License · For educational use only</div>
+    <div class="footer-links">
+      <a href="https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL" target="_blank">GitHub</a>
+      <a href="https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL/blob/main/README.md" target="_blank">README</a>
+    </div>
+  </footer>
+
+  <script>
+    function switchTab(tab, el) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.api-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      el.classList.add('active');
+    }
+
+    // Animate bars on scroll
+    const bars = document.querySelectorAll('.model-bar-fill');
+    const saved = bars.map(b => b.style.width);
+    bars.forEach(b => b.style.width = '0');
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if(e.isIntersecting) {
+          const idx = [...bars].indexOf(e.target);
+          e.target.style.width = saved[idx];
+        }
+      });
+    }, { threshold: 0.3 });
+    bars.forEach(b => io.observe(b));
+  </script>
+
+</body>
+</html>
