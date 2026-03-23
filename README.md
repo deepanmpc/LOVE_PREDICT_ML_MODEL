@@ -11,7 +11,7 @@ It uses a **trained XGBoost classifier** (94.5% accuracy) and supports Random Fo
 
 ---
 
-## ⚙️ Setup & Installation
+##  Setup & Installation
 
 ```bash
 git clone https://github.com/<your-username>/LOVE_PREDICT_ML_MODEL.git
