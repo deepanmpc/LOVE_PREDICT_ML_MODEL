@@ -42,7 +42,14 @@ features = [
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.json
-    input_data = [data.get(f, 0) for f in features]
+    input_data = []
+    for f in features:
+        val = data.get(f, 0)
+        if f == 'AI_model_similarity':
+            val = 1 if val == 'same' else 0
+        elif f == 'proximity_behavior':
+            val = 2 if val == 'close' else (1 if val == 'medium' else 0)
+        input_data.append(val)
     scaled_input = scaler.transform([input_data])
     prediction = model.predict(scaled_input)[0]
     
